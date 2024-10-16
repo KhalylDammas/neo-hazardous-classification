@@ -1,9 +1,13 @@
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sns
+
+from neo.params import *
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.utils import resample
+
+def load_data():
+    df = pd.read_csv(DATA_LOCAL_PATH)
+    return df
 
 def peprocess(df):
     df_majority = df[df['is_hazardous'] == False]
@@ -24,7 +28,6 @@ def peprocess(df):
 
     # Remove rows with any null values
     df.dropna(inplace=True)
-    df.isnull().sum()
 
     X = df.drop(['is_hazardous'], axis=1)
     y = df['is_hazardous']
@@ -33,6 +36,7 @@ def peprocess(df):
     scaler = MinMaxScaler()
     X_scaled = scaler.fit_transform(X)
     df = pd.DataFrame(X_scaled, columns=X.columns) # @
-
+    
+  
 
     return df_processed
