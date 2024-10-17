@@ -6,7 +6,7 @@ from neo.params import *
 from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import MinMaxScaler, StandardScaler, RobustScaler
 
-# Added `clean_data` method...
+# Added clean_data method...
 def clean_data(df: pd.DataFrame) -> pd.DataFrame:
 
     # Drop unnecessary columns.
@@ -16,6 +16,25 @@ def clean_data(df: pd.DataFrame) -> pd.DataFrame:
 
     # Drop missing values.
     df.dropna(inplace=True)
+
+    # Remove outlier
+    columns = ['absolute_magnitude', 'estimated_diameter_max', 'relative_velocity']
+    outlier = []
+
+    for column in columns:
+       Q1 = df[column].quantile(0.25)
+       Q3 = df[column].quantile(0.75)
+       IQR = Q3 - Q1
+
+    lower_bound = Q1 - 1.5 * IQR
+    upper_bound = Q3 + 1.5 * IQR
+
+    column_outliers = df[(df[column] < lower_bound) | (df[column] > upper_bound)].index
+    outlier.extend(column_outliers)
+
+    outlier= list(set(outlier))
+    df.drop(index=outlier , inplace=True)
+
 
     # Down sample the data.
     n_true = len(df.loc[df['is_hazardous'] == True])
