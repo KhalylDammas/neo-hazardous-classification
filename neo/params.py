@@ -4,7 +4,7 @@ import numpy as np
 ######################## VARIABLES ########################
 RANDOM_STATE = int(os.environ.get('RANDOM_STATE'))
 DATA_LOCAL_PATH = os.environ.get('DATA_LOCAL_PATH')
-MAJOR_RATIO = np.float32(os.environ('MAJOR_RATIO'))
+MAJOR_RATIO = np.float32(os.environ.get('MAJOR_RATIO'))
 
 PREFECT_FLOW_NAME = os.environ.get("PREFECT_FLOW_NAME")
 PREFECT_LOG_LEVEL = os.environ.get("PREFECT_LOG_LEVEL")
