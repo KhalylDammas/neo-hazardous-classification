@@ -1,46 +1,53 @@
-import pandas as pd
 import numpy as np
+import pandas as pd
 
 from neo.params import *
-from sklearn.preprocessing import MinMaxScaler
-from sklearn.utils import resample
+# from sklearn.utils import resample
+from sklearn.compose import ColumnTransformer
+from sklearn.preprocessing import MinMaxScaler, StandardScaler, RobustScaler
 
-def load_data():
-    df = pd.read_csv(DATA_LOCAL_PATH)
-    return df
+# Added `clean_data` method...
+def clean_data(df: pd.DataFrame) -> pd.DataFrame:
 
-def peprocess(df):
-    df_majority = df[df['is_hazardous'] == False]
-    df_minority = df[df['is_hazardous'] == True]
+    # Drop unnecessary columns.
+    df.drop(columns=['neo_id','name',
+                     'orbiting_body',
+                     'estimated_diameter_max'],inplace=True)
 
-    n_minority = len(df_minority)
-    df_majority_downsampled = resample(df_majority,
-                                   replace=False,
-                                   n_samples=int(0.7 * (n_minority / 0.3)),  # 70% of the desired total size
-                                   random_state=42)
-
-
-    df_processed = pd.concat([df_majority_downsampled, df_minority])
-    print(df_processed['is_hazardous'].value_counts(normalize=True) * 100)
-
-    # drop columns
-    df.drop(['neo_id','name','orbiting_body','estimated_diameter_min'], axis=1 , inplace = True )
-
-    # Remove rows with any null values
+    # Drop missing values.
     df.dropna(inplace=True)
 
-    X = df.drop(['is_hazardous'], axis=1)
-    y = df['is_hazardous']
+    # Down sample the data.
+    n_true = len(df.loc[df['is_hazardous'] == True])
+    data_length = len(df.index)
+
+    remove = data_length - int(MAJOR_RATIO * (n_true/(1-MAJOR_RATIO)) + n_true)
+    df = df.drop(df.loc[df['is_hazardous'] == False].\
+        sample(remove, random_state=RANDOM_STATE).index).reset_index(drop=True)
+
+    return df
+
+# Changed method name. (peprocess -> preprocessing)
+def preprocessing(df: pd.DataFrame) -> pd.DataFrame:
+
+    assert isinstance(df, pd.DataFrame)
+
+    transformer = ColumnTransformer([
+        ('MinMax_Scale', MinMaxScaler(), ['miss_distance']),
+        ('Standard_Scale', StandardScaler(), ['absolute_magnitude', 'relative_velocity']),
+        ('Robust_Scale', RobustScaler(), ['estimated_diameter_min'])
+    ], remainder='passthrough')
 
     # Initialize MinMaxScaler
     scaler = MinMaxScaler()
     X_scaled = scaler.fit_transform(X)
     df = pd.DataFrame(X_scaled, columns=X.columns) # @
     
+    df = transformer.fit_transform(df)
+    
     #convert data type
     columns_to_convert = ['absolute_magnitude','estimated_diameter_min','relative_velocity','miss_distance','is_hazardous']
 
     df[columns_to_convert] = df[columns_to_convert].astype(np.float32)
 
-
-    return df_processed
+    return df
