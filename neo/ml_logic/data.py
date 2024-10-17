@@ -38,6 +38,16 @@ def preprocessing(df: pd.DataFrame) -> pd.DataFrame:
         ('Robust_Scale', RobustScaler(), ['estimated_diameter_min'])
     ], remainder='passthrough')
 
+    # Initialize MinMaxScaler
+    scaler = MinMaxScaler()
+    X_scaled = scaler.fit_transform(X)
+    df = pd.DataFrame(X_scaled, columns=X.columns) # @
+    
     df = transformer.fit_transform(df)
+    
+    #convert data type
+    columns_to_convert = ['absolute_magnitude','estimated_diameter_min','relative_velocity','miss_distance','is_hazardous']
+
+    df[columns_to_convert] = df[columns_to_convert].astype(np.float32)
 
     return df
