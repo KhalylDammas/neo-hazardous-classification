@@ -5,6 +5,7 @@ import numpy as np
 RANDOM_STATE = int(os.environ.get('RANDOM_STATE'))
 DATA_LOCAL_PATH = os.environ.get('DATA_LOCAL_PATH')
 MAJOR_RATIO = np.float32(os.environ.get('MAJOR_RATIO'))
+MODELS_PATH = os.environ.get('MODELS_PATH')
 
 PREFECT_FLOW_NAME = os.environ.get("PREFECT_FLOW_NAME")
 PREFECT_LOG_LEVEL = os.environ.get("PREFECT_LOG_LEVEL")
