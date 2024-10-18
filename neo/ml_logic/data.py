@@ -18,7 +18,7 @@ def clean_data(df: pd.DataFrame) -> pd.DataFrame:
     df.dropna(inplace=True)
 
     # Remove outlier
-    columns = ['absolute_magnitude', 'estimated_diameter_max', 'relative_velocity']
+    columns = ['absolute_magnitude', 'estimated_diameter_min', 'relative_velocity']
     outlier = []
 
     for column in columns:
@@ -46,10 +46,13 @@ def clean_data(df: pd.DataFrame) -> pd.DataFrame:
 
     return df
 
-# Changed method name. (peprocess -> preprocessing)
 def preprocessing(df: pd.DataFrame) -> pd.DataFrame:
 
     assert isinstance(df, pd.DataFrame)
+
+    #convert data type
+    columns_to_convert = ['absolute_magnitude','estimated_diameter_min','relative_velocity','miss_distance','is_hazardous']
+    df[columns_to_convert] = df[columns_to_convert].astype(np.float32)
 
     transformer = ColumnTransformer([
         ('MinMax_Scale', MinMaxScaler(), ['miss_distance']),
@@ -57,16 +60,13 @@ def preprocessing(df: pd.DataFrame) -> pd.DataFrame:
         ('Robust_Scale', RobustScaler(), ['estimated_diameter_min'])
     ], remainder='passthrough')
 
-    # Initialize MinMaxScaler
-    scaler = MinMaxScaler()
-    X_scaled = scaler.fit_transform(X)
-    df = pd.DataFrame(X_scaled, columns=X.columns) # @
-    
-    df = transformer.fit_transform(df)
-    
-    #convert data type
-    columns_to_convert = ['absolute_magnitude','estimated_diameter_min','relative_velocity','miss_distance','is_hazardous']
+    features_out = ['miss_distance', 'absolute_magnitude', 'relative_velocity',
+                    'estimated_diameter_min', 'is_hazardous']
 
-    df[columns_to_convert] = df[columns_to_convert].astype(np.float32)
+    df = transformer.fit_transform(df)
+
+    df = pd.DataFrame(df, columns=features_out)
+
+    assert isinstance(df, pd.DataFrame)
 
     return df
