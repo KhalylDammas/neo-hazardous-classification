@@ -72,7 +72,7 @@ def clean_data(df: pd.DataFrame) -> pd.DataFrame:
 
     return df
 
-print(clean_data(df))
+# print(clean_data(df))
 
 def preprocessing(df: pd.DataFrame) -> pd.DataFrame:
 
@@ -104,4 +104,4 @@ def preprocessing(df: pd.DataFrame) -> pd.DataFrame:
 
     return df
 
-print(preprocessing(df))
+# print(preprocessing(df))
