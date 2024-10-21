@@ -18,8 +18,9 @@ def initialize_model(load:bool=False) -> Pipeline:
     """
     if load:
         model = model_load()
-        print("✅ Model Loaded")
-        return model
+        if model != None:
+            print("✅ Model Loaded")
+            return model
 
     hyperparams = { #(C=100, gamma=1, kernel='rbf')
         'C':100,
