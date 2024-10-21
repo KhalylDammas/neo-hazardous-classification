@@ -6,6 +6,7 @@ import pandas as pd
 from pathlib import Path
 from neo.params import *
 
+# from sklearn.pipeline import Pipeline
 
 def model_save(model:object, file_name:str=None) -> None:
     '''
@@ -26,7 +27,7 @@ def model_save(model:object, file_name:str=None) -> None:
         pickle.dump(model, file)
 
 
-def model_load(file_name:str=None, most_recent:bool=True) -> None:
+def model_load(file_name:str=None, most_recent:bool=True):
     '''
     Load the model from `models` directory.
     - `file_name`:str (None) -> loads the file with this specific name.
@@ -43,6 +44,7 @@ def model_load(file_name:str=None, most_recent:bool=True) -> None:
             file_name = sort_files[0]
         else:
             print("Directory is Empty...\n")
+            return None
 
     file_path = os.path.join(MODELS_PATH, file_name)
     with open(file_path, 'rb') as file:
