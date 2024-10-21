@@ -1,24 +1,67 @@
-import numpy as np
-from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import MinMaxScaler
-from sklearn.linear_model import LogisticRegression
+import pandas as pd
+
+from neo.ml_logic.registry import *
+from neo.params import *
+
 from sklearn.svm import SVC
-from sklearn.neighbors import KNeighborsClassifier
+from sklearn.pipeline import Pipeline
 from sklearn.model_selection import GridSearchCV
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.linear_model import LogisticRegression
+
 from sklearn.metrics import accuracy_score
+from sklearn.model_selection import train_test_split
 
+def initialize_model(load:bool=False) -> Pipeline:
+    """
+    Initialize the Model, or if `load` = True loads a saved model (if exists).
+    """
+    if load:
+        model = model_load()
+        print("✅ Model Loaded")
+        return model
 
-def initialize_pipeline():
-    """
-    Initialize the Pipeline with MinMaxScaler and a default classifier (LogisticRegression).
-    """
-    pipeline = Pipeline([
-        ('scaler', MinMaxScaler()),  # Scale features to [0, 1]
-        ('classifier', LogisticRegression())  # Placeholder classifier to be replaced in GridSearchCV
+    hyperparams = { #(C=100, gamma=1, kernel='rbf')
+        'C':100,
+        'kernel':'rbf',
+        'gamma':1
+    }
+    svc = SVC(**hyperparams)
+    model = Pipeline([
+        ('classifier', svc)  # Placeholder classifier to be replaced in GridSearchCV
     ])
 
-    print("✅ Pipeline initialized")
-    return pipeline
+    print("✅ Model initialized")
+
+    return model
+
+def model_fit(model:Pipeline, X:pd.DataFrame, y:pd.DataFrame,
+              X_val:pd.DataFrame=None, y_val:pd.DataFrame=None,
+              val_ratio:float=0.2) -> dict:
+    '''
+    Train the model and evaluate its pervormance...
+
+    '''
+    ## EDIT Include -- Now Training -- flag...
+    print("Start model Training...")
+    if X_val != None and y_val != None:
+        results = {
+            'model':model.fit(X, y),
+            'score':model.score(X_val, y_val)
+        }
+
+    else:
+        X_train, X_test, y_train, y_test = \
+            train_test_split(X, y, test_size=val_ratio,
+                             random_state=RANDOM_STATE,
+                             shuffle=True, stratify=y)
+
+        results = {
+            'model':model.fit(X_train, y_train),
+            'score':model.score(X_test, y_test)
+        }
+    print("✅ Model Trained")
+    return results
 
 
 def define_param_grid():
@@ -59,15 +102,15 @@ def perform_grid_search(pipeline, param_grid, X_train, y_train):
     return grid_search
 
 
-def evaluate_best_model(grid_search, X_test, y_test):
+def evaluate_model(model, X_test, y_test):
     """
-    Evaluate the best model from GridSearchCV on the test set and return the accuracy score.
+    Evaluate the Model on the test set and return the accuracy score.
     """
-    y_pred = grid_search.predict(X_test)
+    y_pred = model.predict(X_test)
     accuracy = accuracy_score(y_test, y_pred)
 
-    print("✅ Best model evaluated")
-    print(f'Best model accuracy on the test set: {accuracy:.4f}')
+    print("✅ Model evaluated")
+    print(f'Model accuracy on the test set: {accuracy:.4f}')
     return accuracy
 
 
@@ -77,7 +120,7 @@ if __name__ == '__main__':
     # You can load your dataset here and split it into training and testing sets
 
     # 1. Initialize the pipeline
-    pipeline = initialize_pipeline()
+    pipeline = initialize_model()
 
     # 2. Define the parameter grid
     param_grid = define_param_grid()
