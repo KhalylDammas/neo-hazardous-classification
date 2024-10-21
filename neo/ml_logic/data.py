@@ -6,6 +6,9 @@ from neo.params import *
 from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import MinMaxScaler, StandardScaler, RobustScaler
 
+# load data
+df = pd.read_csv(DATA_LOCAL_PATH)
+
 # Added clean_data method...
 def clean_data(df: pd.DataFrame) -> pd.DataFrame:
 
@@ -16,6 +19,9 @@ def clean_data(df: pd.DataFrame) -> pd.DataFrame:
 
     # Drop missing values.
     df.dropna(inplace=True)
+
+    # Store the original number of rows for comparison
+    original_row_count = df.shape[0]
 
     # Remove outlier
     columns = ['absolute_magnitude', 'estimated_diameter_min', 'relative_velocity']
@@ -44,7 +50,29 @@ def clean_data(df: pd.DataFrame) -> pd.DataFrame:
     df = df.drop(df.loc[df['is_hazardous'] == False].\
         sample(remove, random_state=RANDOM_STATE).index).reset_index(drop=True)
 
+    # Assertions to verify the output
+    assert 'neo_id' not in df.columns, "Error: Column 'neo_id' should have been dropped."
+    print("Success: Column 'neo_id' has been dropped.")
+
+    assert not df.isna().any().any(), "Error: There should be no missing values."
+    print("Success: No missing values.")
+
+    assert isinstance(df, pd.DataFrame), "Error: The output should be a pandas DataFrame."
+    print("Success: Output is a pandas DataFrame.")
+
+    # Assertion to check if the number of rows has decreased
+    new_row_count_after_outliers = df.shape[0]
+    print(f"Original row count: {original_row_count}, New row count after removing outliers: {new_row_count_after_outliers}")
+    assert new_row_count_after_outliers < original_row_count, "Error: The number of rows did not decrease after removing outliers."
+
+    # Assertion to check the number of rows after downsampling
+    new_row_count_after_downsampling = df.shape[0]
+    print(f"New row count after downsampling: {new_row_count_after_downsampling}, Original data length: {data_length}")
+    assert new_row_count_after_downsampling <= data_length, "Error: The number of rows after downsampling exceeds the original number."
+
     return df
+
+print(clean_data(df))
 
 def preprocessing(df: pd.DataFrame) -> pd.DataFrame:
 
@@ -67,6 +95,13 @@ def preprocessing(df: pd.DataFrame) -> pd.DataFrame:
 
     df = pd.DataFrame(df, columns=features_out)
 
-    assert isinstance(df, pd.DataFrame)
+    # Assertions with print statements
+    assert df.shape[1] == len(features_out), "Error: The number of output columns is incorrect."
+    print("Success: The number of output columns is correct.")
+
+    assert isinstance(df, pd.DataFrame), "Error: The output should be a pandas DataFrame."
+    print("Success: Output is a pandas DataFrame.")
 
     return df
+
+print(preprocessing(df))
