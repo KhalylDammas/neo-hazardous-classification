@@ -13,20 +13,23 @@ from sklearn.metrics import accuracy_score
 from sklearn.model_selection import train_test_split
 
 def initialize_model(load:bool=False) -> Pipeline:
+
     """
     Initialize the Model, or if `load` = True loads a saved model (if exists).
     """
     if load:
-        model = model_load()
-        if model != None:
+        model = model_load(most_recent=False)
+        if model is not None:
             print("✅ Model Loaded")
             return model
+        print("❌ Model Cannot be loaded\nSwitch to initialization...")
 
     hyperparams = { #(C=100, gamma=1, kernel='rbf')
         'C':100,
         'kernel':'rbf',
         'gamma':1
     }
+
     svc = SVC(**hyperparams)
     model = Pipeline([
         ('classifier', svc)  # Placeholder classifier to be replaced in GridSearchCV
@@ -38,14 +41,15 @@ def initialize_model(load:bool=False) -> Pipeline:
 
 def model_fit(model:Pipeline, X:pd.DataFrame, y:pd.DataFrame,
               X_val:pd.DataFrame=None, y_val:pd.DataFrame=None,
-              val_ratio:float=0.2) -> dict:
+              val_ratio:float=0.2, save=True) -> dict:
+
     '''
     Train the model and evaluate its pervormance...
 
     '''
-    ## EDIT Include -- Now Training -- flag...
+
     print("Start model Training...")
-    if X_val != None and y_val != None:
+    if X_val is not None and y_val is not None:
         results = {
             'model':model.fit(X, y),
             'score':model.score(X_val, y_val)
@@ -61,6 +65,8 @@ def model_fit(model:Pipeline, X:pd.DataFrame, y:pd.DataFrame,
             'model':model.fit(X_train, y_train),
             'score':model.score(X_test, y_test)
         }
+    if save:
+        model_save(model)
     print("✅ Model Trained")
     return results
 
@@ -115,23 +121,23 @@ def evaluate_model(model, X_test, y_test):
     return accuracy
 
 
-# Example usage
-if __name__ == '__main__':
-    # Assume X_train, X_test, y_train, y_test are pre-defined
-    # You can load your dataset here and split it into training and testing sets
+# # Example usage
+# if __name__ == '__main__':
+#     # Assume X_train, X_test, y_train, y_test are pre-defined
+#     # You can load your dataset here and split it into training and testing sets
 
-    # 1. Initialize the pipeline
-    pipeline = initialize_model()
+#     # 1. Initialize the pipeline
+#     pipeline = initialize_model()
 
-    # 2. Define the parameter grid
-    param_grid = define_param_grid()
+#     # 2. Define the parameter grid
+#     param_grid = define_param_grid()
 
-    # 3. Perform grid search to find the best model
-    grid_search = perform_grid_search(pipeline, param_grid, X_train, y_train)
+#     # 3. Perform grid search to find the best model
+#     grid_search = perform_grid_search(pipeline, param_grid, X_train, y_train)
 
-    # 4. Evaluate the best model
-    evaluate_best_model(grid_search, X_test, y_test)
+#     # 4. Evaluate the best model
+#     evaluate_best_model(grid_search, X_test, y_test)
 
-    # 5. Print the best parameters found by GridSearchCV
-    print("Best parameters found by GridSearchCV:")
-    print(grid_search.best_params_)
+#     # 5. Print the best parameters found by GridSearchCV
+#     print("Best parameters found by GridSearchCV:")
+#     print(grid_search.best_params_)

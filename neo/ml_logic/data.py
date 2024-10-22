@@ -2,7 +2,6 @@ import numpy as np
 import pandas as pd
 
 from neo.params import *
-# from sklearn.utils import resample
 from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import MinMaxScaler, StandardScaler, RobustScaler
 
@@ -74,34 +73,63 @@ def clean_data(df: pd.DataFrame) -> pd.DataFrame:
 
 # print(clean_data(df))
 
-def preprocessing(df: pd.DataFrame) -> pd.DataFrame:
+# def preprocessing(df: pd.DataFrame) -> pd.DataFrame:
 
-    assert isinstance(df, pd.DataFrame)
+#     assert isinstance(df, pd.DataFrame)
 
-    #convert data type
-    columns_to_convert = ['absolute_magnitude','estimated_diameter_min','relative_velocity','miss_distance','is_hazardous']
-    df[columns_to_convert] = df[columns_to_convert].astype(np.float32)
+#     #convert data type
+#     columns_to_convert = ['absolute_magnitude','estimated_diameter_min','relative_velocity','miss_distance','is_hazardous']
+#     df[columns_to_convert] = df[columns_to_convert].astype(np.float32)
 
-    transformer = ColumnTransformer([
-        ('MinMax_Scale', MinMaxScaler(), ['miss_distance']),
-        ('Standard_Scale', StandardScaler(), ['absolute_magnitude', 'relative_velocity']),
-        ('Robust_Scale', RobustScaler(), ['estimated_diameter_min'])
-    ], remainder='passthrough')
+#     transformer = ColumnTransformer([
+#         ('MinMax_Scale', MinMaxScaler(), ['miss_distance']),
+#         ('Standard_Scale', StandardScaler(), ['absolute_magnitude', 'relative_velocity']),
+#         ('Robust_Scale', RobustScaler(), ['estimated_diameter_min'])
+#     ], remainder='passthrough')
 
-    features_out = ['miss_distance', 'absolute_magnitude', 'relative_velocity',
-                    'estimated_diameter_min', 'is_hazardous']
+#     features_out = ['miss_distance', 'absolute_magnitude', 'relative_velocity',
+#                     'estimated_diameter_min', 'is_hazardous']
 
-    df = transformer.fit_transform(df)
+#     df = transformer.fit_transform(df)
 
-    df = pd.DataFrame(df, columns=features_out)
+#     df = pd.DataFrame(df, columns=features_out)
 
-    # Assertions with print statements
-    assert df.shape[1] == len(features_out), "Error: The number of output columns is incorrect."
-    print("Success: The number of output columns is correct.")
+#     # Assertions with print statements
+#     assert df.shape[1] == len(features_out), "Error: The number of output columns is incorrect."
+#     print("Success: The number of output columns is correct.")
 
-    assert isinstance(df, pd.DataFrame), "Error: The output should be a pandas DataFrame."
-    print("Success: Output is a pandas DataFrame.")
+#     assert isinstance(df, pd.DataFrame), "Error: The output should be a pandas DataFrame."
+#     print("Success: Output is a pandas DataFrame.")
+#     return df
 
-    return df
 
 # print(preprocessing(df))
+
+class pre_processor():
+
+    def __init__(self):
+        self.transformer = ColumnTransformer([
+            ('MinMax_Scale', MinMaxScaler(), ['miss_distance']),
+            ('Standard_Scale', StandardScaler(), ['absolute_magnitude', 'relative_velocity']),
+            ('Robust_Scale', RobustScaler(), ['estimated_diameter_min'])
+        ], remainder='drop')
+
+        self.features_out = ['miss_distance', 'absolute_magnitude',
+                             'relative_velocity','estimated_diameter_min']
+
+    def fit(self, df:pd.DataFrame) -> None:
+        self.transformer.fit(df)
+
+    def transform(self, df:pd.DataFrame) -> pd.DataFrame:
+
+        df = self.transformer.transform(df)
+
+        df = pd.DataFrame(df, columns=self.features_out)
+
+        assert df.shape[1] == len(self.features_out), "Error: The number of output columns is incorrect."
+        print("Success: The number of output columns is correct.")
+
+        assert isinstance(df, pd.DataFrame), "Error: The output should be a pandas DataFrame."
+        print("Success: Output is a pandas DataFrame.")
+
+        return df
