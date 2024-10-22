@@ -8,7 +8,7 @@ from neo.params import *
 
 # from sklearn.pipeline import Pipeline
 
-def model_save(model:object, file_name:str=None) -> None:
+def model_save(model:object, file_name:str='SVC_Best.pkl') -> None:
     '''
     Saves the model as `.pkl`.
     ####
@@ -16,7 +16,7 @@ def model_save(model:object, file_name:str=None) -> None:
     - model:object -> The model to be saved.
     - file_name:str (None) -> set the file name. If `None` uses the current tame stamp as the files name (YYYY-mm-dd_HHMMSS.pkl)
     '''
-    if file_name==None:
+    if file_name is None:
         format_time = datetime.datetime.now().strftime("%Y-%m-%d_%H%M%S")
         file_name = f"{format_time}.pkl"
 
@@ -26,8 +26,10 @@ def model_save(model:object, file_name:str=None) -> None:
     with open(file_path, 'wb') as file:
         pickle.dump(model, file)
 
+    print("✅ Model Saved")
 
-def model_load(file_name:str=None, most_recent:bool=True):
+
+def model_load(file_name:str='SVC_Best.pkl', most_recent:bool=True):
     '''
     Load the model from `models` directory.
     - `file_name`:str (None) -> loads the file with this specific name.
@@ -36,6 +38,7 @@ def model_load(file_name:str=None, most_recent:bool=True):
     returns:-
         model:object -> Loaded model.
     '''
+
     if most_recent:
         pkl_files = [file for file in Path(MODELS_PATH).glob('.pkl')]
 
@@ -45,6 +48,9 @@ def model_load(file_name:str=None, most_recent:bool=True):
         else:
             print("Directory is Empty...\n")
             return None
+
+    if file_name[-4:] !='.pkl':
+        file_name = f"{file_name}.pkl"
 
     file_path = os.path.join(MODELS_PATH, file_name)
     with open(file_path, 'rb') as file:
