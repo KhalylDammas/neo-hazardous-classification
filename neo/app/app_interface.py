@@ -63,17 +63,11 @@ def input_page():
     st.header("Input Hazardous Object Details")
 
     absolute_magnitude = st.number_input("Enter Absolute Magnitude:", min_value=0.0, format="%.2f")
-    estimated_diameter_min = st.number_input("Enter Estimated Minimum Diameter (meters):", min_value=0.0, format="%.2f")
-    relative_velocity = st.number_input("Enter Relative Velocity (km/h):", min_value=0.0, format="%.2f")
-    miss_distance = st.number_input("Enter Miss Distance (kilometers):", min_value=0.0, format="%.2f")
+    estimated_diameter_min = st.number_input("Enter Estimated Minimum Diameter (Kilometers):", min_value=0.0, format="%.2f")
+    relative_velocity = st.number_input("Enter Relative Velocity (Km/h):", min_value=0.0, format="%.2f")
+    miss_distance = st.number_input("Enter Miss Distance (Kilometers):", min_value=0.0, format="%.2f")
 
     if st.button("Predict"):
-        # Display the entered values
-        st.write(f"Absolute Magnitude: {absolute_magnitude}")
-        st.write(f"Estimated Maximum Diameter: {estimated_diameter_min} meters")
-        st.write(f"Relative Velocity: {relative_velocity} km/h")
-        st.write(f"Miss Distance: {miss_distance} kilometers")
-
         # Prepare the payload to send to FastAPI
         payload = {
             "absolute_magnitude": absolute_magnitude,
@@ -86,10 +80,16 @@ def input_page():
         try:
             response = requests.get("http://127.0.0.1:8000/prediction", params=payload)
             response_data = response.json()
+            pred = None
 
             # Display the prediction result
             if response.status_code == 200:
-                st.success(f"Prediction: {response_data['prediction']}")
+                if response_data['prediction']:
+                    pred='Hazardous'
+                    st.error(f"Prediction: {pred}")
+                else:
+                    pred='Non-Hazardous'
+                    st.success(f"Prediction: {pred}")
             else:
                 st.error("Error: Could not fetch prediction. Please check the inputs or try again later.")
         except Exception as e:
