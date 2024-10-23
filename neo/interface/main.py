@@ -87,8 +87,6 @@ def evaluate(model, X_test, y_test):
     print("Model Evaluation...")
     evaluation_score = evaluate_model(model=model, X_test=X_test, y_test=y_test)
 
-    print(f"Evaluation Score: {evaluation_score:.4f}")
-
     return evaluation_score
 
 

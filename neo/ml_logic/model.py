@@ -9,7 +9,7 @@ from sklearn.model_selection import GridSearchCV
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.linear_model import LogisticRegression
 
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import accuracy_score, f1_score, recall_score, precision_score
 from sklearn.model_selection import train_test_split
 
 def initialize_model(load:bool=False) -> Pipeline:
@@ -115,9 +115,12 @@ def evaluate_model(model, X_test, y_test):
     """
     y_pred = model.predict(X_test)
     accuracy = accuracy_score(y_test, y_pred)
+    f1 = f1_score(y_test, y_pred)
+    recall = recall_score(y_test, y_pred)
+    precision = precision_score(y_test, y_pred)
 
     print("✅ Model evaluated")
-    print(f'Model accuracy on the test set: {accuracy:.4f}')
+    print(f"Accuracy={accuracy:.2f}, Precision={precision:.2f}, Recall{recall:.2f}, F1_Score{f1:.2f}")
     return accuracy
 
 
