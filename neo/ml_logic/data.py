@@ -71,39 +71,6 @@ def clean_data(df: pd.DataFrame) -> pd.DataFrame:
 
     return df
 
-# print(clean_data(df))
-
-# def preprocessing(df: pd.DataFrame) -> pd.DataFrame:
-
-#     assert isinstance(df, pd.DataFrame)
-
-#     #convert data type
-#     columns_to_convert = ['absolute_magnitude','estimated_diameter_min','relative_velocity','miss_distance','is_hazardous']
-#     df[columns_to_convert] = df[columns_to_convert].astype(np.float32)
-
-#     transformer = ColumnTransformer([
-#         ('MinMax_Scale', MinMaxScaler(), ['miss_distance']),
-#         ('Standard_Scale', StandardScaler(), ['absolute_magnitude', 'relative_velocity']),
-#         ('Robust_Scale', RobustScaler(), ['estimated_diameter_min'])
-#     ], remainder='passthrough')
-
-#     features_out = ['miss_distance', 'absolute_magnitude', 'relative_velocity',
-#                     'estimated_diameter_min', 'is_hazardous']
-
-#     df = transformer.fit_transform(df)
-
-#     df = pd.DataFrame(df, columns=features_out)
-
-#     # Assertions with print statements
-#     assert df.shape[1] == len(features_out), "Error: The number of output columns is incorrect."
-#     print("Success: The number of output columns is correct.")
-
-#     assert isinstance(df, pd.DataFrame), "Error: The output should be a pandas DataFrame."
-#     print("Success: Output is a pandas DataFrame.")
-#     return df
-
-
-# print(preprocessing(df))
 
 class pre_processor():
 
