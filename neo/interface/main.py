@@ -1,4 +1,3 @@
-import numpy as np
 import pandas as pd
 
 from neo.params import *
@@ -7,7 +6,7 @@ from neo.ml_logic.model import *
 
 from sklearn.model_selection import train_test_split
 
-def preprocess(data:pd.DataFrame, transformer:object, fit=False) -> tuple:
+def preprocess(transformer:object, fit=False) -> tuple:
     '''
     Pre-Precesses the data.
     Remove outliers and missing values, Balances the classes ratio.
@@ -23,6 +22,8 @@ def preprocess(data:pd.DataFrame, transformer:object, fit=False) -> tuple:
     if fit = False.
     - `data_dict`:dict, `transformer`:pre-processor -> A dictionary contatins all data splits train/val/test X/y, fitted transformer.
     '''
+    data = pd.read_csv(DATA_LOCAL_PATH)
+
     data = clean_data(data)
 
     X = data.drop(columns=['is_hazardous'])
@@ -95,10 +96,12 @@ def predict(X, model=None):
     """
     Load the model, predict based on feature input, and return the prediction.
     """
-
+    transformer = pre_processor()
+    transformer = preprocess(transformer, fit=True)
     if model is None:
-        initialize_model(load=True)
+        model = initialize_model(load=True)
     # Predict the result
+    X = transformer.transform(X)
     prediction = model.predict(X)
 
     # Prediction as boolean
@@ -109,12 +112,11 @@ def predict(X, model=None):
 
 
 if __name__ == '__main__':
-
-    data = pd.read_csv(DATA_LOCAL_PATH)
+    breakpoint()
 
     transformer = pre_processor()
 
-    data_dict, transformer = preprocess(data, transformer)
+    data_dict, transformer = preprocess(transformer)
 
     X_train, y_train = data_dict['train']
     X_val, y_val = data_dict['val']
@@ -133,8 +135,4 @@ if __name__ == '__main__':
         'estimated_diameter_min': [40.783282],
     })
 
-    X_new = transformer.transform(X_new)
-
     y_pred = predict(X_new, model)
-
-    # print(f'is Hazurdus?: {y_pred}')
