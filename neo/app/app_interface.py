@@ -3,6 +3,7 @@ import requests
 import base64
 import os
 
+PORT = os.getenv("PORT")
 st.set_page_config(layout="wide")
 
 def get_base64_image(file_path):
@@ -78,7 +79,7 @@ def input_page():
 
         # Send the request to the FastAPI server
         try:
-            response = requests.get("http://127.0.0.1:8000/prediction", params=payload)
+            response = requests.get(f"http://127.0.0.1:{PORT}/prediction", params=payload)
             response_data = response.json()
             pred = None
 
