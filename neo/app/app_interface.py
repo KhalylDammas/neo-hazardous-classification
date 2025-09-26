@@ -4,7 +4,10 @@ import base64
 import os
 
 PORT = os.getenv("PORT")
-st.set_page_config(layout="wide")
+st.set_page_config(layout="wide",
+                   page_title="NEO - Near Earth Objects",
+                   page_icon=":rocket:",
+                   initial_sidebar_state="collapsed")
 
 def get_base64_image(file_path):
     with open(file_path, "rb") as image_file:
@@ -122,7 +125,8 @@ def main_page():
     st.markdown('</div>', unsafe_allow_html=True)
 
 # Sidebar navigation
-st.sidebar.title("Navigation")
+
+# st.sidebar.title("Navigation")
 if 'page' not in st.session_state:
     st.session_state.page = "Home"
 
