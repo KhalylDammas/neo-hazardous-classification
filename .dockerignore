@@ -1,0 +1,13 @@
+neo/raw_data/
+neo/__pycache__/
+neo/**/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
+.pytest_cache/
+.git/
+.gitignore
+README.md
+.DS_Store
+*.log
