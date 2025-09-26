@@ -1,3 +1,8 @@
 raw_data/
 neo/raw_data/
 neo/notebooks/Khalyl\'s_Notebook.ipynb
+
+# Python cache files
+__pycache__/
+*.py[cod]
+*$py.class
